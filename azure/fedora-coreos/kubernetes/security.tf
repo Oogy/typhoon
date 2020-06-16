@@ -115,6 +115,21 @@ resource "azurerm_network_security_rule" "controller-vxlan" {
   destination_address_prefix  = azurerm_subnet.controller.address_prefix
 }
 
+resource "azurerm_network_security_rule" "controller-linux-vxlan" {
+  resource_group_name = azurerm_resource_group.cluster.name
+
+  name                        = "allow-linux-vxlan"
+  network_security_group_name = azurerm_network_security_group.controller.name
+  priority                    = "2021"
+  access                      = "Allow"
+  direction                   = "Inbound"
+  protocol                    = "Udp"
+  source_port_range           = "*"
+  destination_port_range      = "8472"
+  source_address_prefixes     = [azurerm_subnet.controller.address_prefix, azurerm_subnet.worker.address_prefix]
+  destination_address_prefix  = azurerm_subnet.controller.address_prefix
+}
+
 # Allow Prometheus to scrape node-exporter daemonset
 resource "azurerm_network_security_rule" "controller-node-exporter" {
   resource_group_name = azurerm_resource_group.cluster.name
@@ -247,6 +262,21 @@ resource "azurerm_network_security_rule" "worker-vxlan" {
   protocol                    = "Udp"
   source_port_range           = "*"
   destination_port_range      = "4789"
+  source_address_prefixes     = [azurerm_subnet.controller.address_prefix, azurerm_subnet.worker.address_prefix]
+  destination_address_prefix  = azurerm_subnet.worker.address_prefix
+}
+
+resource "azurerm_network_security_rule" "worker-linux-vxlan" {
+  resource_group_name = azurerm_resource_group.cluster.name
+
+  name                        = "allow-linux-vxlan"
+  network_security_group_name = azurerm_network_security_group.worker.name
+  priority                    = "2016"
+  access                      = "Allow"
+  direction                   = "Inbound"
+  protocol                    = "Udp"
+  source_port_range           = "*"
+  destination_port_range      = "8472"
   source_address_prefixes     = [azurerm_subnet.controller.address_prefix, azurerm_subnet.worker.address_prefix]
   destination_address_prefix  = azurerm_subnet.worker.address_prefix
 }
