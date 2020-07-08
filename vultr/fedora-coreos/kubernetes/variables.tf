@@ -71,9 +71,9 @@ variable "worker_snippets" {
 
 # configuration
 
-variable "ssh_fingerprints" {
+variable "ssh_keys" {
   type        = list(string)
-  description = "SSH public key fingerprints. (e.g. see `ssh-add -l -E md5`)"
+  description = "SSH public keys"
 }
 
 variable "networking" {
