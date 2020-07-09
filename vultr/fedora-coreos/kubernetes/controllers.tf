@@ -1,16 +1,33 @@
 resource "vultr_server" "controllers" {
-  count                  = var.controller_count
-  region_id              = data.vultr_region.cluster_region.id
-  os_id                  = data.vultr_os.os_image.id
-  plan_id                = data.vultr_plan.controller_type.id
-  label                  = "${var.cluster_name}-controller-${count.index}"
-  hostname               = "${var.cluster_name}-controller-${count.index}"
-  tag                    = "${var.cluster_name}-controller"
-  ssh_key_ids            = vultr_ssh_key.keychain.*.id
-  enable_private_network = true
-  network_ids            = [vultr_network.cluster_network.id]
-  firewall_group_id      = vultr_firewall_group.cluster_firewall.id
-  notify_activate        = var.notify_activate
-  auto_backup            = var.autobackup_controllers
+  count             = var.controller_count
+  region_id         = data.vultr_region.cluster_region.id
+  os_id             = data.vultr_os.os_image.id
+  plan_id           = data.vultr_plan.controller_type.id
+  label             = "${var.cluster_name}-controller-${count.index}"
+  hostname          = "${var.cluster_name}-controller-${count.index}"
+  tag               = "${var.cluster_name}-controller"
+  network_ids       = [vultr_network.cluster_network.id]
+  firewall_group_id = vultr_firewall_group.cluster_firewall.id
+  notify_activate   = var.notify_activate
+  auto_backup       = var.autobackup_controllers
   #user_data              = data.ct_config.controller-ignitions.*.rendered[count.index]
 }
+
+resource "vultr_dns_record" "controllers" {
+  count  = var.controller_count
+  domain = vultr_dns_domain.dns_zone.id
+  name   = "${var.cluster_name}${count.index}"
+  data   = vultr_server.controllers[count.index].main_ip
+  type   = "A"
+  ttl    = 120
+}
+
+resource "vultr_dns_record" "etcds" {
+  count  = var.controller_count
+  domain = vultr_dns_domain.dns_zone.id
+  name   = "${var.cluster_name}-etcd${count.index}"
+  data   = vultr_server.controllers[count.index].main_ip
+  type   = "A"
+  ttl    = 120
+}
+
