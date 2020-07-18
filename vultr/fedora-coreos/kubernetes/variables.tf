@@ -20,11 +20,13 @@ variable "dns_zone" {
 variable "notify_activate" {
   type        = bool
   description = "Send instance activation notification email: (true or false)"
+  default     = false
 }
 
 variable "autobackup_controllers" {
   type        = bool
   description = "Enable Vultr Auto-backups for Controller instances"
+  default     = false
 }
 
 variable "controller_count" {
@@ -82,6 +84,12 @@ variable "networking" {
   default     = "flannel"
 }
 
+variable "node_cidr" {
+  type        = string
+  description = "CIDR IPv4 range to assign to Kubernetes controller nodes"
+  default     = "10.1.0.0/16"
+}
+
 variable "pod_cidr" {
   type        = string
   description = "CIDR IPv4 range to assign Kubernetes pods"
@@ -103,4 +111,14 @@ variable "enable_aggregation" {
   default     = false
 }
 
+variable "cluster_domain_suffix" {
+  type        = string
+  description = "Queries for domains with the suffix will be answered by coredns. Default is cluster.local (e.g. foo.default.svc.cluster.local) "
+  default     = "cluster.local"
+}
 
+variable "asset_dir" {
+  type        = string
+  description = "Absolute path to a directory where generated assets should be placed (contains secrets)"
+  default     = ""
+}
