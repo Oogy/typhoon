@@ -4,7 +4,6 @@ resource "vultr_server" "workers" {
   os_id             = data.vultr_os.os_image.id
   plan_id           = data.vultr_plan.worker_type.id
   label             = "${var.cluster_name}-worker-${count.index}"
-  hostname          = "${var.cluster_name}-worker-${count.index}"
   tag               = "${var.cluster_name}-worker"
   network_ids       = [vultr_network.cluster_network.id]
   firewall_group_id = vultr_firewall_group.cluster_firewall.id
@@ -30,5 +29,6 @@ data "template_file" "worker-config" {
     ssh_keys               = yamlencode(var.ssh_keys)
     node_private_ip        = cidrhost(var.node_cidr, 20+count.index) # Reserve 10.x.x.2-10.x.x.19 for Control Nodes
     node_cidr_netmask      = split("/", var.node_cidr)[1]
+    node_hostname          = "${var.cluster_name}-worker-${count.index}"
   }
 }

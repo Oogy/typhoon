@@ -4,7 +4,6 @@ resource "vultr_server" "controllers" {
   os_id             = data.vultr_os.os_image.id
   plan_id           = data.vultr_plan.controller_type.id
   label             = "${var.cluster_name}-controller-${count.index}"
-  hostname          = "${var.cluster_name}-controller-${count.index}"
   tag               = "${var.cluster_name}-controller"
   network_ids       = [vultr_network.cluster_network.id]
   firewall_group_id = vultr_firewall_group.cluster_firewall.id
@@ -53,6 +52,7 @@ data "template_file" "controller-configs" {
     ssh_keys               = yamlencode(var.ssh_keys)
     node_private_ip        = cidrhost(var.node_cidr, 2+count.index) 
     node_cidr_netmask      = split("/", var.node_cidr)[1]
+    node_hostname          = "${var.cluster_name}-controller-${count.index}"
   }
 }
 
